@@ -115,13 +115,13 @@ function addRoles() {
                 choices: function() {
                     var depArr = [];
                     for (i = 0; i < res.length; i++) {
-                      depArr.push(res[i].title);
+                      depArr.push(res[i].names);
                     }
                     return depArr;
-                  },
+                  }
             }
         ]).then(function(answer) {
-            const newDept;
+            var newDept;
             for (i = 0; i < res.length; i++){
                 if (res[i].names === answer.department) {
                     newDept = res[i].id;
@@ -139,11 +139,55 @@ function addRoles() {
 }
 
 function addEmployees() {
-    console.log("addEmployees");
-    start()
+   connection.query("SELECT * FROM roles INNER JOIN employee ON employee.role_id = roles.id", function(err, res){
+       console.table(res)
+        var manager = [];
+        for (i = 0; i < res.length; i++){
+            if (res[i].manager_id === null) {
+                manager.push(res[i].first_name)
+            }
+        }
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "firstName",
+                message: "What is the employee's first Name?"
+            },
+            {
+                type: "input",
+                name: "lastName",
+                message: "What is the employee's last name?"
+            },
+            {
+                type: "list",
+                name: "roles",
+                message: "What role would you like to add them to?",
+                choices: function() {
+                    var roleArr = [];
+                    for (i = 0; i < res.length; i++) {
+                      roleArr.push(res[i].title);
+                    }
+                    return roleArr;
+                  }
+            }
+        ]).then(function(answer) {
+            var newRole;
+            for (i = 0; i < res.length; i++){
+                if (res[i].title === answer.roles) {
+                    newRole = res[i].id;
+                }
+            }
+            connection.query("INSERT INTO employee SET ?", 
+            {
+                first_name: answer.first_name,
+                last_name: answer.lastName
+
+            }
+            )
+        })
+   })
 }
 
 function updateRoles() {
-    console.log("Update Roles");
-    start()
+    
 }
