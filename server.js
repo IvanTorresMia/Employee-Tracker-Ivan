@@ -89,14 +89,51 @@ function addDepartments(){
             message: "What department would you like to add?"
         }
     ]).then(function(answer){
-        connection.query("INSERT INTO department SET ?", {title: answer.department})
+        connection.query("INSERT INTO department SET ?", {names: answer.department})
         console.log("You added a department!")
     } )
 }
 
 function addRoles() {
     connection.query("SELECT * FROM department", function(err, res){
-        console.log(res.id);
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "newRole",
+                message: "What is the name of the role?"
+            },
+            {
+                type: "input",
+                name: "newSalary",
+                message: "what is the salary of the role?"
+            },
+            {
+                type: "list",
+                name: "department",
+                message: "what is the department you want to add into?",
+                choices: function() {
+                    var depArr = [];
+                    for (i = 0; i < res.length; i++) {
+                      depArr.push(res[i].title);
+                    }
+                    return depArr;
+                  },
+            }
+        ]).then(function(answer) {
+            const newDept;
+            for (i = 0; i < res.length; i++){
+                if (res[i].names === answer.department) {
+                    newDept = res[i].id;
+                }
+            }
+            connection.query("INSERT INTO roles SET ?", 
+            {
+                title: answer.newRole,
+                salary: answer.newSalary,
+                department_id: newDept
+            })
+        })
     } )
     
 }
