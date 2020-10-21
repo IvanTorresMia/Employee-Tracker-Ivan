@@ -44,6 +44,7 @@ function start() {
           "Add roles",
           "Add employees",
           "Update roles",
+          "delete employee",
           "Exit",
         ],
       },
@@ -71,6 +72,9 @@ function start() {
         case "Update roles":
           updateRoles();
           break;
+        case "delete employee":
+          deleteEmployee();
+          break;
         case "Exit":
           connection.end();
           break;
@@ -85,9 +89,10 @@ async function viewDepartments() {
   // const res = await connection.query("SELECT * FROM departments");
   // console.table(res);
 
-  connection.query("SELECT * FROM departments", function (err, data) {
+  connection.query("SELECT * FROM departments", function (err, res) {
     if (err) throw err;
     console.table(res);
+    start();
   });
 }
 
@@ -96,6 +101,7 @@ function viewRoles() {
     "SELECT roles.id, roles.title, departments.name, roles.salary FROM roles INNER JOIN departments ON roles.department_id = departments.id",
     function (err, res) {
       console.table(res);
+      start();
     }
   );
 }
@@ -106,6 +112,7 @@ function viewEmployees() {
     function (err, res) {
       if (err) throw err;
       console.table(res);
+      start();
     }
   );
 }
@@ -124,6 +131,7 @@ function addDepartments() {
         name: answer.department,
       });
       console.log("You added a department!");
+      start();
     });
 }
 
@@ -166,7 +174,10 @@ function addRoles() {
           title: answer.newRole,
           salary: answer.newSalary,
           department_id: newDept,
+
         });
+        console.log("You added a role!")
+        start();
       });
   });
 }
@@ -241,6 +252,7 @@ function addEmployees() {
               function (err) {
                 if (err) throw err;
                 console.log("Successfully added an employee!");
+                start();
               }
             );
           });
@@ -262,7 +274,7 @@ function updateRoles() {
           choices: function () {
             const employeeArr = [];
             for (i = 0; i < empRes.length; i++) {
-              employee.push(`${empRes[i].first_name} ${empRes[i].last_name}`);
+              employeeArr.push(`${empRes[i].first_name} ${empRes[i].last_name}`);
             }
             return employeeArr;
           }
@@ -273,15 +285,80 @@ function updateRoles() {
             message: "what is their new role?",
             choices: function () {
               const roleArr = [];
-              for (i = 0; i < empRes.length; i++) {
-                roleArr.push(roleRes[i].title);
+              for (i = 0; i < rolesRes.length; i++) {
+                roleArr.push(rolesRes[i].title);
               }
               return roleArr;
             }
           }
       ]).then(function(answer){
+          let splitEmployee = answer.employee.split(" ");
+          let firstName = splitEmployee[0];
+          let lastName = splitEmployee[1];
 
+         let updateRole;
+         for (i = 0; i < rolesRes.length; i++) {
+           if (rolesRes[i].title === answer.role) {
+             updateRole = rolesRes[i].id;
+           }
+         }
+          connection.query("UPDATE employees SET ? WHERE ? AND ?", [
+            {
+              role_id: updateRole
+            },
+            {
+              first_name: firstName
+            },
+            {
+              last_name: lastName
+            }
+          ], function(err, res) {
+            if (err) throw err;
+            console.log("You just updated a role!")
+            start();
+            return res;
+          })   
       })
     });
   });
+}
+
+function deleteEmployee() {
+    connection.query("SELECT * FROM employees", function(err, res) {
+      if (err) throw err;
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "employee",
+          message: "Which employee would you like to delete?",
+          choices: function () {
+            const employeeArr = [];
+            for (i = 0; i < res.length; i++) {
+              employeeArr.push(`${res[i].first_name} ${res[i].last_name}`);
+            }
+            return employeeArr;
+          }
+        }
+      ]).then(function(answer) {
+        let splitEmployee = answer.employee.split(" ");
+        let firstName = splitEmployee[0];
+        let lastName = splitEmployee[1];
+
+        connection.query("DELETE FROM employees WHERE ? AND ?", [
+          {
+            first_name: firstName
+          },
+          {
+            last_name: lastName
+          }
+        ], function(err, res) {
+          if (err) throw err;
+          console.log("You just deleted a role!")
+          start();
+          return res;
+        })   
+      })
+
+    })
+
 }
