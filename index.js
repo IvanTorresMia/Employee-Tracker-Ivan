@@ -21,14 +21,13 @@ let connection = mysql.createConnection({
 // connect to the mysql server and sql database
 connection.connect(function (err) {
   if (err) throw err;
-  // console.log(rows)
-  // run the start function after the connection is made to prompt the user
   start();
 });
 
 // Promisify so that I can use async/await syntax
 // connection.query = util.promisify(connection.query);
 
+// This function starts you out asking you what you want to do! :)
 function start() {
   inquirer
     .prompt([
@@ -84,11 +83,9 @@ function start() {
     });
 }
 
-async function viewDepartments() {
-  // Async/Await version
-  // const res = await connection.query("SELECT * FROM departments");
-  // console.table(res);
 
+// This function Allows you to view all departments
+async function viewDepartments() {
   connection.query("SELECT * FROM departments", function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -96,6 +93,7 @@ async function viewDepartments() {
   });
 }
 
+// This function allows you to vew all roles.
 function viewRoles() {
   connection.query(
     "SELECT roles.id, roles.title, departments.name, roles.salary FROM roles INNER JOIN departments ON roles.department_id = departments.id",
@@ -105,7 +103,8 @@ function viewRoles() {
     }
   );
 }
-// Make sure every employee also has the manager at the end.
+
+// This function allows you to Vew all the employees and their managers.
 function viewEmployees() {
   connection.query(
     "SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name, roles.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM departments INNER JOIN roles ON departments.id = roles.department_id INNER JOIN employees ON roles.id = employees.role_id LEFT JOIN employees manager ON employees.manager_id = manager.id ORDER BY employees.id ASC",
@@ -117,6 +116,7 @@ function viewEmployees() {
   );
 }
 
+//This function allows you to view all the departments
 function addDepartments() {
   inquirer
     .prompt([
@@ -135,6 +135,7 @@ function addDepartments() {
     });
 }
 
+// This function allows you to add Roles to you company.
 function addRoles() {
   connection.query("SELECT * FROM departments", function (err, res) {
     if (err) throw err;
@@ -182,10 +183,10 @@ function addRoles() {
   });
 }
 
+// This function allows you to add employees to you company.
 function addEmployees() {
   connection.query(
     "SELECT * FROM roles",
-    // JOIN employees ON employees.role_id = roles.id GROUP BY roles.title",
     function (err, roleRes) {
       connection.query("SELECT * FROM employees", function (err, empRes) {
         inquirer
@@ -261,6 +262,7 @@ function addEmployees() {
   );
 }
 
+// This function allows you to update the roles of your employees.
 function updateRoles() {
   connection.query("SELECT * FROM employees", function (err, empRes) {
     if (err) throw err;
@@ -323,6 +325,7 @@ function updateRoles() {
   });
 }
 
+// This function allows you to delete employees.
 function deleteEmployee() {
     connection.query("SELECT * FROM employees", function(err, res) {
       if (err) throw err;
