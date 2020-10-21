@@ -11,7 +11,7 @@
 * [License](#License)
 
 ## Description 
-Hi! Welcome to my Employee Tracker App! Here You will find a way to keep track of your entire companies, employees, and managers for each department. In this app you are also able to add, delete, or update employess as well as wiew all the employees you currently have in your company. Navigate to the usage section where I have a video that explains how to use the app!
+Hi! Welcome to my Employee Tracker App! Here You will find a way to keep track of your entire companies, employees, and managers for each department. In this app you are also able to add, delete, or update employess as well as wiew all the employees you currently have in your company. Navigate to the usage where I will provide instruction as to how to use this app. 
 
 
 ## Technologies
@@ -124,8 +124,17 @@ function viewEmployees() {
 
 
 ## Usage
-[Usage-Video](https://drive.google.com/file/d/1LGy1IfXMMrCYD3GC1WQpJG-t-X_o8UCy/view)
+### MySql Workbench
+So In order to Run this app you have to install everything that is in the installation section right below. After you are all set and done you will have to login to you MySql Work bench and createa a seed and schema file. Then you want to copy and past everything provided in the sql files in order to get started. 
 
+### Node.js
+Once you are all set you will want to type in your password in the index.js file but for now I have my password in there as a place holder. The You will open the integrated terminal and run 
+```
+node index.js
+```
+
+### The app
+There you will be provided with a serious of inquirer prompts where you will have the option to either view all employees, add employees, update emplyees and much more. Have fun! 
 
 ## Installation
 In order to run this app you have to install inquirer using 
